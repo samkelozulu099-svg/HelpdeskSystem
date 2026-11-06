@@ -1,0 +1,65 @@
+﻿@model HelpdeskSystem.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+
+    string StatusClass(string s) => s switch
+    {
+        "Open" => "bg-primary",
+        "In Progress" => "bg-warning text-dark",
+        "Resolved" => "bg-success",
+        _ => "bg-secondary"
+    };
+    string PriorityClass(string p) => p switch
+    {
+        "High" => "bg-danger",
+        "Medium" => "bg-warning text-dark",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="d-flex flex-wrap">
+    <nav class="bg-dark text-white p-3" style="width:190px; min-height:480px;">
+        <div class="fw-bold mb-3">Helpdesk</div>
+        <a class="d-block py-2 px-2 text-white bg-primary text-decoration-none rounded" href="/Dashboard">Dashboard</a>
+        <a class="d-block py-2 px-2 text-light text-decoration-none" href="/Tickets">All tickets</a>
+        <a class="d-block py-2 px-2 text-light text-decoration-none" href="#">Technician queue</a>
+        <a class="d-block py-2 px-2 text-light text-decoration-none" href="#">Users</a>
+    </nav>
+
+    <main class="flex-fill p-4" style="min-width:0;">
+        <h1 class="h3 mb-3">Dashboard</h1>
+
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3"><div class="card p-3"><div class="text-muted small">Open</div><div class="fs-2 fw-semibold">@Model.Open</div></div></div>
+            <div class="col-6 col-md-3"><div class="card p-3"><div class="text-muted small">In progress</div><div class="fs-2 fw-semibold">@Model.InProgress</div></div></div>
+            <div class="col-6 col-md-3"><div class="card p-3"><div class="text-muted small">Resolved</div><div class="fs-2 fw-semibold">@Model.Resolved</div></div></div>
+            <div class="col-6 col-md-3"><div class="card p-3"><div class="text-muted small">Avg resolution</div><div class="fs-2 fw-semibold">@Model.AvgResolutionHours.ToString("0.0") h</div></div></div>
+        </div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr><th>ID</th><th>Title</th><th>Priority</th><th>Status</th><th>Assigned to</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model.Recent)
+                        {
+                            <tr>
+                                <td>#@t.Id</td>
+                                <td>@t.Title</td>
+                                <td><span class="badge @PriorityClass(t.Priority)">@t.Priority</span></td>
+                                <td><span class="badge @StatusClass(t.Status)">@t.Status</span></td>
+                                <td>@(string.IsNullOrEmpty(t.AssignedTo) ? "Unassigned" : t.AssignedTo)</td>
+                            </tr>
+                        }
+                        @if (!Model.Recent.Any())
+                        {
+                            <tr><td colspan="5" class="text-muted">No tickets yet.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
